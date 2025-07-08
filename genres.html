@@ -1,0 +1,113 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genres - Francis Solademi</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Francis Solademi</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="genres.html">Genres</a></li>
+            <li><a href="pricing.html">Packages</a></li>
+            <li><a href="testimonials.html">Testimonials</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="hamburger">☰</div>
+    </nav>
+
+    <section class="genres">
+        <h1>My Genres</h1>
+        <div class="genre-tabs">
+            <div class="genre">
+                <h2>Contemporary Romance</h2>
+                <p>Heartfelt stories of love, connection, and modern relationships that resonate deeply.</p>
+                <a href="#" class="btn secondary">Read a Sample</a>
+                <p class="testimonial">"Francis brought my love story to life with such emotion!" – A. Thompson</p>
+            </div>
+            <div class="genre">
+                <h2>Paranormal & Shifter</h2>
+                <p>Mystical tales of otherworldly romance and shape-shifting heroes.</p>
+                <a href="#" class="btn secondary">Read a Sample</a>
+            </div>
+            <div class="genre">
+                <h2>Cozy Fiction</h2>
+                <p>Warm, inviting stories perfect for a cozy night in.</p>
+                <a href="#" class="btn secondary">Read a Sample</a>
+                <p class="testimonial">"My cozy mystery was pitch-perfect!" – S. Daniels</p>
+            </div>
+            <div class="genre">
+                <h2>Memoirs</h2>
+                <p>Personal stories told with authenticity and emotional depth.</p>
+                <a href="#" class="btn secondary">Read a Sample</a>
+            </div>
+            <div class="genre">
+                <h2>Self-Help</h2>
+                <p>Inspiring guides to personal growth and empowerment.</p>
+                <a href="#" class="btn secondary">Read a Sample</a>
+            </div>
+            <div class="genre">
+                <h2>Short Stories</h2>
+                <p>Compact, powerful narratives that pack an emotional punch.</p>
+                <a href="#" class="btn secondary">Read a Sample</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; Francis Solademi. All rights reserved.</p>
+        <div class="social-links">
+            <a href="https://www.upwork.com/freelancers/contemporaryromanceghostwriter">Upwork</a>
+            <a href="#">Instagram</a>
+            <a href="#">LinkedIn</a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
